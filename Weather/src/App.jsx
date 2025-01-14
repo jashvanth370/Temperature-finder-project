@@ -51,13 +51,58 @@ const WeatherDetails=({icon,temp,city,lat,log,humidity,wind})=>{
   );
 }
 function App() {
+  
+
+  let api_key ="a310db4cb8a196104c769b6f86c3e3ff";
   const [icon,setIcon] = useState(RainIcon);
   const [temp,setTemp] = useState(0);
-  const [city,setCity] = useState("Batticaloa");
+  const [city,setCity] = useState("Chennai");
   const [lat,setLat] =useState(0);
   const [log,setLong] =useState(0);
   const [humidity,setHumidity] =useState(0);
   const [wind,setWind] =useState(0);
+  const [text,setText] =useState("chennai");
+  const [cityNotFound, setCityNotFound] =useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const search=async()=>{
+    setLoading(true);
+    let url=`https://api.openweathermap.org/data/2.5/weather?q=${text}&appid=${api_key}&units=metric`;
+    
+    try{
+      let res =await fetch(url);
+      let data =await res.json();
+      //console.log(data);
+      if(data.cod==="404"){
+        console.error("City Not Found");
+        setCityNotFound(true);
+        setLoading(false);
+        return;
+      }
+      setHumidity(data.main.humidity);
+      setWind(data.wind.speed);
+      setTemp(Math.floor(data.main.temp));
+      setCity(data.name);
+      setLat(data.coord.lat);
+      setLong(data.coord.lon);
+    }
+    catch(error){
+      console.error("An error occured:", error.message);
+    }
+    finally{
+      setLoading(false);
+    }
+  }
+
+  const handleCity = (e) =>{
+    setText(e.target.value);
+  };
+
+  const handleKeyDown = (e) =>{
+    if(e.key === "Enter"){
+      search();
+    }
+  };
 
   return (
     <>
@@ -65,9 +110,11 @@ function App() {
         <div className='input-container'>
           <input type="text" 
           className='cityInput'
-          placeholder='Search City'/>
+          placeholder='Search City'onChange={handleCity}
+          value={text}
+          onKeyDown={handleKeyDown}/>
           <div className='search-icon'>
-            <img src={SearchIcon} alt="search" width="25px"/>
+            <img src={SearchIcon} alt="search" width="25px" onClick={()=> search()}/>
           </div>
         </div>        
       <WeatherDetails icon={icon} temp={temp} city={city} lat={lat} log={log} humidity={humidity} wind={wind}/>
