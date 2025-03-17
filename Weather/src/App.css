@@ -125,3 +125,13 @@ body{
     height: 50px;
     width: 50px;
 }
+
+.city-not-message,
+.error-message,
+.loading-message{
+    margin-top: 10px;
+    color: #888;
+    font-size: 25px;
+    font-weight: 480;
+    text-align: center;
+}
